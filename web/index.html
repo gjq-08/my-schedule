@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#4A9FE8">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>我的日程</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <header id="top-bar">
+      <span class="app-title">我的日程</span>
+      <nav id="tab-nav">
+        <button class="tab active" data-tab="home">首页</button>
+        <button class="tab" data-tab="timetable">课表</button>
+        <button class="tab" data-tab="activities">日程</button>
+        <button class="tab" data-tab="todos">待办</button>
+        <button class="tab" data-tab="countdown">倒计日</button>
+      </nav>
+      <div class="top-right">
+        <span id="week-info"></span>
+        <button id="settings-btn" aria-label="设置">⚙</button>
+      </div>
+    </header>
+    <main id="page-content">
+      <p class="loading">加载中…</p>
+    </main>
+    <nav id="bottom-tabs">
+      <button class="btab active" data-tab="home">首页</button>
+      <button class="btab" data-tab="timetable">课表</button>
+      <button class="btab" data-tab="activities">日程</button>
+      <button class="btab" data-tab="todos">待办</button>
+      <button class="btab" data-tab="countdown">倒计日</button>
+    </nav>
+  </div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

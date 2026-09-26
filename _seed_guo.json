@@ -1,0 +1,501 @@
+{
+ "confirm": true,
+ "replace_semesters": true,
+ "clear_courses": true,
+ "semesters": [
+  {
+   "name": "2026-2027 学年秋季学期",
+   "start_monday": "2026-09-07",
+   "total_weeks": 19
+  },
+  {
+   "name": "2026-2027 学年春季学期",
+   "start_monday": "2027-03-01",
+   "total_weeks": 18
+  }
+ ],
+ "holidays": [
+  {
+   "date": "2026-09-25",
+   "name": "中秋节"
+  },
+  {
+   "date": "2026-10-01",
+   "name": "国庆节"
+  },
+  {
+   "date": "2026-10-02",
+   "name": "国庆节"
+  },
+  {
+   "date": "2026-10-03",
+   "name": "国庆节"
+  },
+  {
+   "date": "2027-01-01",
+   "name": "元旦"
+  },
+  {
+   "date": "2027-04-05",
+   "name": "清明节"
+  },
+  {
+   "date": "2027-05-01",
+   "name": "劳动节"
+  },
+  {
+   "date": "2027-05-02",
+   "name": "劳动节"
+  },
+  {
+   "date": "2027-06-09",
+   "name": "端午节"
+  }
+ ],
+ "courses": [
+  {
+   "name": "毛泽东思想和中国特色社会主义理论体系概论",
+   "teacher": "彭付芝",
+   "location": "科研三号楼1032",
+   "weekday": 1,
+   "start_period": 1,
+   "end_period": 4,
+   "week_start": 2,
+   "week_end": 4,
+   "parity": "all",
+   "color": "#4A9FE8"
+  },
+  {
+   "name": "毛泽东思想和中国特色社会主义理论体系概论",
+   "teacher": "彭付芝",
+   "location": "科研三号楼1032",
+   "weekday": 1,
+   "start_period": 1,
+   "end_period": 4,
+   "week_start": 6,
+   "week_end": 6,
+   "parity": "all",
+   "color": "#4A9FE8"
+  },
+  {
+   "name": "毛泽东思想和中国特色社会主义理论体系概论",
+   "teacher": "华思衡",
+   "location": "科研三号楼1032",
+   "weekday": 1,
+   "start_period": 1,
+   "end_period": 4,
+   "week_start": 7,
+   "week_end": 9,
+   "parity": "all",
+   "color": "#4A9FE8"
+  },
+  {
+   "name": "毛泽东思想和中国特色社会主义理论体系概论",
+   "teacher": "王海宇",
+   "location": "科研三号楼1032",
+   "weekday": 1,
+   "start_period": 1,
+   "end_period": 4,
+   "week_start": 10,
+   "week_end": 10,
+   "parity": "all",
+   "color": "#4A9FE8"
+  },
+  {
+   "name": "毛泽东思想和中国特色社会主义理论体系概论",
+   "teacher": "张超",
+   "location": "科研三号楼1032",
+   "weekday": 1,
+   "start_period": 1,
+   "end_period": 4,
+   "week_start": 11,
+   "week_end": 14,
+   "parity": "all",
+   "color": "#4A9FE8"
+  },
+  {
+   "name": "数学分析(1)",
+   "teacher": "Antoine Kickens",
+   "location": "教学二号楼5004",
+   "weekday": 1,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 2,
+   "week_end": 2,
+   "parity": "all",
+   "color": "#FF8C6B"
+  },
+  {
+   "name": "数学分析(1)",
+   "teacher": "Kickens,David FEUTRIE,VONG VINCENT,NGUYEN REMY",
+   "location": "教学二号楼5004",
+   "weekday": 1,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 4,
+   "week_end": 16,
+   "parity": "even",
+   "color": "#FF8C6B"
+  },
+  {
+   "name": "代数(1)",
+   "teacher": "Kickens,VONG VINCENT,NGUYEN REMY,David FEUTRIE",
+   "location": "教学二号楼5004",
+   "weekday": 1,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 3,
+   "week_end": 17,
+   "parity": "odd",
+   "color": "#6DD5B3"
+  },
+  {
+   "name": "电子学",
+   "teacher": "Rémy LIENARD",
+   "location": "教学一号楼3001",
+   "weekday": 1,
+   "start_period": 8,
+   "end_period": 9,
+   "week_start": 2,
+   "week_end": 16,
+   "parity": "even",
+   "color": "#FFD166"
+  },
+  {
+   "name": "电子学",
+   "teacher": "Rémy LIENARD",
+   "location": "教学一号楼3001",
+   "weekday": 1,
+   "start_period": 8,
+   "end_period": 9,
+   "week_start": 3,
+   "week_end": 17,
+   "parity": "odd",
+   "color": "#FFD166"
+  },
+  {
+   "name": "综合法语(3)",
+   "teacher": "朱佳琪",
+   "location": "教学二号楼5002",
+   "weekday": 2,
+   "start_period": 1,
+   "end_period": 2,
+   "week_start": 2,
+   "week_end": 3,
+   "parity": "all",
+   "color": "#A5B4FC"
+  },
+  {
+   "name": "综合法语(3)",
+   "teacher": "朱佳琪",
+   "location": "教学二号楼5002",
+   "weekday": 2,
+   "start_period": 1,
+   "end_period": 2,
+   "week_start": 5,
+   "week_end": 17,
+   "parity": "all",
+   "color": "#A5B4FC"
+  },
+  {
+   "name": "综合法语(3)",
+   "teacher": "PIAIA Nicolas Jean-Baptiste",
+   "location": "教学二号楼5002",
+   "weekday": 2,
+   "start_period": 1,
+   "end_period": 2,
+   "week_start": 4,
+   "week_end": 4,
+   "parity": "all",
+   "color": "#A5B4FC"
+  },
+  {
+   "name": "代数(1)",
+   "teacher": "VONG VINCENT,NGUYEN REMY,David FEUTRIE",
+   "location": "科研一号楼1040",
+   "weekday": 2,
+   "start_period": 3,
+   "end_period": 5,
+   "week_start": 2,
+   "week_end": 16,
+   "parity": "even",
+   "color": "#6DD5B3"
+  },
+  {
+   "name": "数学分析(1)",
+   "teacher": "VONG VINCENT,NGUYEN REMY,David FEUTRIE",
+   "location": "科研一号楼1040",
+   "weekday": 2,
+   "start_period": 3,
+   "end_period": 5,
+   "week_start": 3,
+   "week_end": 17,
+   "parity": "odd",
+   "color": "#FF8C6B"
+  },
+  {
+   "name": "综合物理实验",
+   "teacher": "华陈强",
+   "location": null,
+   "weekday": 2,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 3,
+   "week_end": 16,
+   "parity": "all",
+   "color": "#2B7CD8"
+  },
+  {
+   "name": "综合法语实训(3)",
+   "teacher": "朱佳琪",
+   "location": "教学二号楼4001",
+   "weekday": 2,
+   "start_period": 8,
+   "end_period": 9,
+   "week_start": 3,
+   "week_end": 3,
+   "parity": "all",
+   "color": "#14b8a6"
+  },
+  {
+   "name": "电子学",
+   "teacher": "Christophe Caire",
+   "location": "科研一号楼1055",
+   "weekday": 3,
+   "start_period": 1,
+   "end_period": 3,
+   "week_start": 2,
+   "week_end": 3,
+   "parity": "all",
+   "color": "#FFD166"
+  },
+  {
+   "name": "电子学",
+   "teacher": "Christophe Caire",
+   "location": "科研一号楼1055",
+   "weekday": 3,
+   "start_period": 1,
+   "end_period": 3,
+   "week_start": 5,
+   "week_end": 17,
+   "parity": "all",
+   "color": "#FFD166"
+  },
+  {
+   "name": "综合法语实训(3)",
+   "teacher": "Célia SALEM",
+   "location": "教学一号楼B1001",
+   "weekday": 3,
+   "start_period": 4,
+   "end_period": 4,
+   "week_start": 2,
+   "week_end": 17,
+   "parity": "all",
+   "color": "#14b8a6"
+  },
+  {
+   "name": "综合物理实验",
+   "teacher": "华陈强",
+   "location": "科研一号楼1040",
+   "weekday": 3,
+   "start_period": 6,
+   "end_period": 9,
+   "week_start": 2,
+   "week_end": 2,
+   "parity": "all",
+   "color": "#2B7CD8"
+  },
+  {
+   "name": "心理健康（3）",
+   "teacher": "方瑶",
+   "location": "教学一号楼2004",
+   "weekday": 3,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 6,
+   "week_end": 6,
+   "parity": "all",
+   "color": "#84cc16"
+  },
+  {
+   "name": "国家安全（3）",
+   "teacher": "王浩伟",
+   "location": "科研一号楼1055",
+   "weekday": 3,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 8,
+   "week_end": 8,
+   "parity": "all",
+   "color": "#f97316"
+  },
+  {
+   "name": "国家安全（3）",
+   "teacher": "王浩伟",
+   "location": "科研一号楼1055",
+   "weekday": 3,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 12,
+   "week_end": 12,
+   "parity": "all",
+   "color": "#f97316"
+  },
+  {
+   "name": "形势与政策(3)",
+   "teacher": "陈萌",
+   "location": null,
+   "weekday": 3,
+   "start_period": 8,
+   "end_period": 9,
+   "week_start": 3,
+   "week_end": 5,
+   "parity": "all",
+   "color": "#6366f1"
+  },
+  {
+   "name": "形势与政策(3)",
+   "teacher": "陈萌",
+   "location": "科研一号楼1001",
+   "weekday": 3,
+   "start_period": 8,
+   "end_period": 9,
+   "week_start": 10,
+   "week_end": 10,
+   "parity": "all",
+   "color": "#6366f1"
+  },
+  {
+   "name": "综合法语(3)",
+   "teacher": "BRIAND Thomas Xiao Bao",
+   "location": "教学二号楼5002",
+   "weekday": 4,
+   "start_period": 1,
+   "end_period": 2,
+   "week_start": 2,
+   "week_end": 17,
+   "parity": "all",
+   "color": "#A5B4FC"
+  },
+  {
+   "name": "代数(1)",
+   "teacher": "VONG VINCENT,NGUYEN REMY,David FEUTRIE",
+   "location": "科研一号楼1040",
+   "weekday": 4,
+   "start_period": 3,
+   "end_period": 5,
+   "week_start": 2,
+   "week_end": 16,
+   "parity": "even",
+   "color": "#6DD5B3"
+  },
+  {
+   "name": "数学分析(1)",
+   "teacher": "VONG VINCENT,NGUYEN REMY,David FEUTRIE",
+   "location": "科研一号楼1040",
+   "weekday": 4,
+   "start_period": 3,
+   "end_period": 5,
+   "week_start": 3,
+   "week_end": 17,
+   "parity": "odd",
+   "color": "#FF8C6B"
+  },
+  {
+   "name": "体育（3）",
+   "teacher": "何子薇",
+   "location": "体育馆羽毛球厅",
+   "weekday": 4,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 2,
+   "week_end": 17,
+   "parity": "all",
+   "color": "#e11d48"
+  },
+  {
+   "name": "电子学",
+   "teacher": "Christophe Caire",
+   "location": "科研一号楼1055",
+   "weekday": 5,
+   "start_period": 1,
+   "end_period": 3,
+   "week_start": 5,
+   "week_end": 5,
+   "parity": "all",
+   "color": "#FFD166"
+  },
+  {
+   "name": "英语实践(1)",
+   "teacher": "朱国振",
+   "location": "教学一号楼3002",
+   "weekday": 5,
+   "start_period": 2,
+   "end_period": 3,
+   "week_start": 2,
+   "week_end": 17,
+   "parity": "all",
+   "color": "#06b6d4"
+  },
+  {
+   "name": "综合法语实训(3)",
+   "teacher": "朱佳琪",
+   "location": "教学二号楼4001",
+   "weekday": 5,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 2,
+   "week_end": 2,
+   "parity": "all",
+   "color": "#14b8a6"
+  },
+  {
+   "name": "综合法语实训(3)",
+   "teacher": "朱佳琪",
+   "location": "教学二号楼4001",
+   "weekday": 5,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 4,
+   "week_end": 17,
+   "parity": "all",
+   "color": "#14b8a6"
+  },
+  {
+   "name": "综合法语(3)",
+   "teacher": "BRIAND Thomas Xiao Bao",
+   "location": "教学二号楼5004",
+   "weekday": 5,
+   "start_period": 8,
+   "end_period": 9,
+   "week_start": 2,
+   "week_end": 17,
+   "parity": "all",
+   "color": "#A5B4FC"
+  },
+  {
+   "name": "电子学",
+   "teacher": "Christophe Caire",
+   "location": "科研一号楼1055",
+   "weekday": 6,
+   "start_period": 1,
+   "end_period": 3,
+   "week_start": 5,
+   "week_end": 5,
+   "parity": "all",
+   "color": "#FFD166"
+  },
+  {
+   "name": "代数(1)",
+   "teacher": "Kickens,VONG VINCENT,NGUYEN REMY,David FEUTRIE",
+   "location": "教学二号楼5004",
+   "weekday": 6,
+   "start_period": 6,
+   "end_period": 7,
+   "week_start": 5,
+   "week_end": 5,
+   "parity": "all",
+   "color": "#6DD5B3"
+  }
+ ]
+}
