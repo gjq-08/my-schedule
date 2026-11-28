@@ -1,9 +1,9 @@
 {
-  "versionCode": 27,
-  "versionName": "4.18",
-  "notes": "正式版移除全部内置数据：课程、日程、待办、倒计日、标签和假期均从空白开始\n已有手机上的数据不会被覆盖；全新安装或清除数据后显示空白状态\n演示数据改为仅生成到本地 dev 目录，不再打包",
-  "apkObjectPath": "updates/android/my-schedule-4.18.apk",
-  "sha256": "d3a49c1d05946f2b62f486e9f034dbe0fac32a2a1564e87b86de4b7c57637f20",
-  "size": 4966457,
+  "versionCode": 28,
+  "versionName": "4.19",
+  "notes": "设置「关于」新增「联系我们」，可直接打开 GitHub 主页\n保留正式版空白数据、四个小组件、整页设置和内更新",
+  "apkObjectPath": "updates/android/my-schedule-4.19.apk",
+  "sha256": "b5eea6e05f7828cb168fbda72864491c89b5aecf7ef9aa497451d2d21aa77093",
+  "size": 4967401,
   "publishedAt": "2026-11-28"
 }

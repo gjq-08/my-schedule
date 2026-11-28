@@ -20,7 +20,7 @@ import {
   channelMuteReason,
   openAppSettings,
 } from '../native-notify.js';
-import { ICON_BELL, ICON_CALENDAR, ICON_CLOCK, ICON_ARCHIVE, ICON_WIDGETS, ICON_DOWNLOAD, ICON_CHEVRON } from '../icons.js';
+import { ICON_BELL, ICON_CALENDAR, ICON_CLOCK, ICON_ARCHIVE, ICON_WIDGETS, ICON_DOWNLOAD, ICON_LINK, ICON_CHEVRON } from '../icons.js';
 import { checkForUpdates, getCurrentVersion, isUpdateNative } from '../update.js';
 
 const SETTINGS_MODULES = [
@@ -29,6 +29,7 @@ const SETTINGS_MODULES = [
   { key: 'reminders', group: '提醒通知', title: '提醒设置', desc: '权限、铃声、振动与测试', icon: ICON_BELL },
   { key: 'backup', group: '数据与桌面', title: '数据备份', desc: '换机前导出，恢复时覆盖导入', icon: ICON_ARCHIVE },
   { key: 'widgets', group: '数据与桌面', title: '桌面小组件', desc: '添加到桌面并保持刷新', icon: ICON_WIDGETS },
+  { key: 'contact', group: '关于', title: '联系我们', desc: 'GitHub 主页与问题反馈', icon: ICON_LINK },
   { key: 'update', group: '关于', title: '软件更新', desc: '版本检查与覆盖安装', icon: ICON_DOWNLOAD },
 ];
 
@@ -59,6 +60,15 @@ function settingsGuide(title, intro, steps = []) {
       `).join('')}</ol>` : ''}
     </div>
   `;
+}
+
+async function openExternalUrl(url) {
+  const bridge = window.Capacitor?.Plugins?.SystemBridge;
+  if (bridge?.openUrl) {
+    await bridge.openUrl({ url });
+    return;
+  }
+  window.open(url, '_blank', 'noopener');
 }
 
 function homeHtml() {
@@ -94,6 +104,7 @@ export async function openSettingsModal(data) {
     reminders: renderReminders,
     backup: renderBackup,
     widgets: renderWidgets,
+    contact: renderContact,
     update: renderUpdate,
   };
 
@@ -653,6 +664,36 @@ export async function openSettingsModal(data) {
       await syncWidgetsNow();
       showToast('小组件已同步', 'success');
       renderWidgets(page);
+    });
+  }
+
+  // ===== 联系我们 =====
+  function renderContact(page) {
+    page.innerHTML = `
+      <div class="settings-section">
+        ${settingsGuide('联系与反馈', '遇到问题、发现异常或有功能建议，可以在 GitHub 找到我。')}
+      </div>
+      <div class="settings-section">
+        <div class="section-title">GitHub</div>
+        <div class="contact-card">
+          <span class="contact-icon">${ICON_LINK}</span>
+          <div class="contact-info">
+            <span class="contact-name">gjq-08</span>
+            <span class="contact-url">github.com/gjq-08</span>
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button class="btn btn-primary btn-sm" id="open-github-btn">打开 GitHub 主页</button>
+        </div>
+        <p class="settings-hint">反馈问题时，建议附上手机系统版本、App 版本和复现步骤。</p>
+      </div>
+    `;
+    page.querySelector('#open-github-btn')?.addEventListener('click', async () => {
+      try {
+        await openExternalUrl('https://github.com/gjq-08');
+      } catch {
+        showToast('无法打开浏览器，请手动访问 github.com/gjq-08', 'error');
+      }
     });
   }
 

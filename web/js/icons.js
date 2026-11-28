@@ -26,6 +26,7 @@ export const ICON_UPLOAD = svg('<path d="M12 15V5"/><path d="M7.5 9.5 12 5l4.5 4
 export const ICON_X = svg('<path d="M6 6l12 12M18 6 6 18"/>');
 export const ICON_GRID = svg('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>');
 export const ICON_LIST = svg('<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>');
+export const ICON_LINK = svg('<path d="M10 13.5a4 4 0 0 0 5.7 0l2.8-2.8a4 4 0 0 0-5.7-5.7l-1.3 1.3"/><path d="M14 10.5a4 4 0 0 0-5.7 0l-2.8 2.8a4 4 0 0 0 5.7 5.7l1.3-1.3"/>');
 
 // 顶栏品牌标记：极简几何，与角色「小飞」区分，避免每页都出现卡通形象
 export const LOGO_MARK = `<svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
