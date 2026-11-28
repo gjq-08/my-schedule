@@ -1,9 +1,9 @@
 {
-  "versionCode": 28,
-  "versionName": "4.19",
-  "notes": "设置「关于」新增「联系我们」，可直接打开 GitHub 主页\n保留正式版空白数据、四个小组件、整页设置和内更新",
-  "apkObjectPath": "updates/android/my-schedule-4.19.apk",
-  "sha256": "b5eea6e05f7828cb168fbda72864491c89b5aecf7ef9aa497451d2d21aa77093",
-  "size": 4967401,
+  "versionCode": 29,
+  "versionName": "4.20",
+  "notes": "修复天津大学教务导入无法获取学期列表的问题\n保留正式版空白数据、四个小组件、整页设置和内更新",
+  "apkObjectPath": "updates/android/my-schedule-4.20.apk",
+  "sha256": "59c81fce629638fda7a736c3bb52d53644ce841a491a1c02b1454b9699da540e",
+  "size": 4968111,
   "publishedAt": "2026-11-28"
 }
