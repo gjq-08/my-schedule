@@ -134,6 +134,44 @@ check('天大优先请求 dataQuery 学期日历', calendarCalls.length === 1
 check('天大学期日历接口可用', calendarLoaded?.length === 3 && calendarLoaded[0].id === '278');
 check('天大学期日历标记当前学期', calendarLoaded?.some(t => t.id === '295' && t.current));
 check('天大学期日历忽略重复与损坏条目', (tju.parseSemesterCalendar?.('{id:1,schoolYear:"2026-2027",name:"1"}{id:1,schoolYear:"2026-2027",name:"1"}{id:"x",schoolYear:"2026-2027",name:"1"}') || []).length === 1);
+
+// --- TJU TaskActivity schedule parsing ---
+function bits53(weeks) {
+  return Array.from({ length: 53 }, (_, i) => weeks.includes(i + 1) ? '1' : '0').join('');
+}
+function activityBlock(teacher, code, name, room, weeks, indexes) {
+  return `
+var teachers = [{ id: 1, name: "${teacher}", lab: false }];
+var actTeachers = [{ id: 1, name: "${teacher}", lab: false }];
+var assistant = [];
+var assistantName = "";
+var actTeacherId = [];
+var actTeacherName = [];
+for (var i = 0; i < actTeachers.length; i++) {
+  actTeacherId.push(actTeachers[i].id);
+  actTeacherName.push(actTeachers[i].name);
+}
+activity = new TaskActivity(actTeacherId.join(','), actTeacherName.join(','), "${code}", "${name}", "8866", "${room}", "${bits53(weeks)}", null, "", assistantName, "", "", "");
+${indexes.map(([day, section]) => `index = ${day} * unitCount + ${section};\ntable0.activities[index][table0.activities[index].length] = activity;`).join('\n')}
+`;
+}
+const tjuScheduleHtml = activityBlock('张三', '2030323(04815)', '高等数学', '50楼A124', [4, 5, 6, 7, 8, 9, 10, 11], [[0, 0], [0, 1]])
+  + activityBlock('李四', '2100196(04806)', '大学物理', '31楼251', [5, 7, 9, 11, 13, 15, 17, 19], [[1, 4], [1, 5]])
+  + activityBlock('王五', '2082113(04444)', '线性代数', '45楼B404', [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], [[1, 2], [1, 3]]);
+
+const tjuParsed = tju.parseTaskActivities?.(tjuScheduleHtml);
+check('天大活动按每门课独立解析', tjuParsed?.courses?.length === 3);
+check('天大节次取本课自己的星期与节次',
+  tjuParsed?.courses?.some(c => c.name === '高等数学' && c.day === 1 && c.startSection === 1 && c.endSection === 2)
+  && tjuParsed?.courses?.some(c => c.name === '大学物理' && c.day === 2 && c.startSection === 5 && c.endSection === 6)
+  && tjuParsed?.courses?.some(c => c.name === '线性代数' && c.day === 2 && c.startSection === 3 && c.endSection === 4)
+  && !tjuParsed?.courses?.some(c => c.startSection === 1 && c.endSection === 10));
+check('天大教师与教室不再串课',
+  tjuParsed?.courses?.some(c => c.name === '高等数学' && c.teacher === '张三' && c.position === '50楼A124')
+  && tjuParsed?.courses?.some(c => c.name === '大学物理' && c.teacher === '李四' && c.position === '31楼251')
+  && tjuParsed?.courses?.some(c => c.name === '线性代数' && c.teacher === '王五' && c.position === '45楼B404'));
+check('天大周次按位图解析', eq(tjuParsed?.courses?.find(c => c.name === '大学物理')?.weeks || [], [5, 7, 9, 11, 13, 15, 17, 19]));
+check('天大学期周数取实际最大周次', tjuParsed?.totalWeeks === 19);
 const bridgeMessages = [];
 window.__portalNative = { postMessage: json => bridgeMessages.push(JSON.parse(json)) };
 const indexMock = '<script>bg.form.addInput(form,"ids","123456");</script>';

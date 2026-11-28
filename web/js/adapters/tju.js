@@ -269,23 +269,140 @@
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
 
-  function parseWeeks(str) {
-    var s = String(str || '');
-    var parity = /单/.test(s) ? 'odd' : (/双/.test(s) ? 'even' : 'all');
+  function unescapeQuoted(str) {
+    return String(str || '').replace(/\\(["'\\])/g, '$1');
+  }
+
+  function quotedArgs(body) {
     var out = [];
-    var re = /(\d{1,2})\s*[-~—–]\s*(\d{1,2})/g;
+    var re = /"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'/g;
     var m;
-    while ((m = re.exec(s))) {
-      var a = Number(m[1]);
-      var b = Number(m[2]);
-      for (var w = a; w <= b && w <= 30; w++) out.push(w);
+    while ((m = re.exec(String(body || '')))) {
+      out.push(unescapeQuoted(m[1] !== undefined ? m[1] : m[2]));
     }
-    if (!out.length) {
-      re = /(\d{1,2})\s*周/g;
-      while ((m = re.exec(s))) out.push(Number(m[1]));
-    }
-    if (parity !== 'all') out = out.filter(function (w) { return parity === 'odd' ? w % 2 === 1 : w % 2 === 0; });
     return out;
+  }
+
+  function callBody(source, open) {
+    var depth = 0;
+    var quote = '';
+    var esc = false;
+    for (var i = open; i < source.length; i++) {
+      var ch = source.charAt(i);
+      if (quote) {
+        if (esc) { esc = false; continue; }
+        if (ch === '\\') { esc = true; continue; }
+        if (ch === quote) quote = '';
+        continue;
+      }
+      if (ch === '"' || ch === "'") { quote = ch; continue; }
+      if (ch === '(') { depth++; continue; }
+      if (ch === ')') {
+        depth--;
+        if (depth === 0) return source.slice(open + 1, i);
+      }
+    }
+    return '';
+  }
+
+  function teacherNames(block) {
+    var keys = ['actTeachers', 'teachers'];
+    for (var k = 0; k < keys.length; k++) {
+      var m = block.match(new RegExp('var\\s+' + keys[k] + '\\s*=\\s*([\\s\\S]*?);'));
+      if (!m) continue;
+      var names = [];
+      var re = /name\s*:\s*["']([^"']+)["']/g;
+      var q;
+      while ((q = re.exec(m[1]))) {
+        var n = text(q[1]);
+        if (n && names.indexOf(n) < 0) names.push(n);
+      }
+      if (names.length) return names;
+    }
+    return [];
+  }
+
+  function weeksOfBits(bits) {
+    var out = [];
+    for (var i = 0; i < bits.length; i++) {
+      if (bits.charAt(i) === '1') out.push(i + 1);
+    }
+    return out;
+  }
+
+  function parseTaskActivities(html) {
+    var source = String(html || '');
+    var result = { courses: [], skipped: 0, totalWeeks: 0, startMonday: startMondayOf(source) };
+    var anchors = [];
+    var are = /new\s+TaskActivity\s*\(/g;
+    var am;
+    while ((am = are.exec(source))) anchors.push(am.index);
+    if (!anchors.length) return result;
+
+    var teacherStarts = [];
+    var tre = /var\s+teachers\s*=/g;
+    var tm;
+    while ((tm = tre.exec(source))) teacherStarts.push(tm.index);
+
+    for (var i = 0; i < anchors.length; i++) {
+      var anchor = anchors[i];
+      var args = quotedArgs(callBody(source, source.indexOf('(', anchor)));
+      var bitIdx = -1;
+      for (var s = 0; s < args.length; s++) {
+        if (/^[01]{20,}$/.test(args[s])) { bitIdx = s; break; }
+      }
+      if (bitIdx < 4) { result.skipped++; continue; }
+
+      var name = text(args[bitIdx - 3]).trim();
+      var position = text(args[bitIdx - 1]).trim();
+      var weeks = weeksOfBits(args[bitIdx]);
+      if (!name || !weeks.length) { result.skipped++; continue; }
+
+      var start = 0;
+      for (var t = teacherStarts.length - 1; t >= 0; t--) {
+        if (teacherStarts[t] < anchor) { start = teacherStarts[t]; break; }
+      }
+      if (i > 0 && anchors[i - 1] > start) start = anchors[i - 1];
+      var end = source.length;
+      if (i + 1 < anchors.length) end = Math.min(end, anchors[i + 1]);
+      for (var t2 = 0; t2 < teacherStarts.length; t2++) {
+        if (teacherStarts[t2] > anchor) { end = Math.min(end, teacherStarts[t2]); break; }
+      }
+      var fill = source.indexOf('fillTable', anchor);
+      if (fill >= 0) end = Math.min(end, fill);
+      var teachers = teacherNames(source.slice(start, end));
+
+      var days = [];
+      var idxRe = /index\s*=\s*(\d)\s*\*\s*unitCount\s*\+\s*(\d{1,2})\s*;/g;
+      var im;
+      while ((im = idxRe.exec(source.slice(anchor, end)))) {
+        var d = Number(im[1]);
+        var sec = Number(im[2]) + 1;
+        if (d < 0 || d > 6 || sec < 1 || sec > 16) continue;
+        var day = d + 1;
+        if (!days[day]) days[day] = [];
+        if (days[day].indexOf(sec) < 0) days[day].push(sec);
+      }
+
+      var emitted = false;
+      for (var dayNo = 1; dayNo <= 7; dayNo++) {
+        if (!days[dayNo] || !days[dayNo].length) continue;
+        days[dayNo].sort(function (a, b) { return a - b; });
+        result.courses.push({
+          name: name,
+          teacher: teachers.length ? teachers.join(',') : null,
+          position: position || null,
+          day: dayNo,
+          startSection: days[dayNo][0],
+          endSection: days[dayNo][days[dayNo].length - 1],
+          weeks: weeks.slice(),
+        });
+        emitted = true;
+      }
+      if (!emitted) result.skipped++;
+      else if (weeks[weeks.length - 1] > result.totalWeeks) result.totalWeeks = weeks[weeks.length - 1];
+    }
+    return result;
   }
 
   function courseNameOfCell(td) {
@@ -297,81 +414,13 @@
   }
 
   function parseSchedule(html) {
-    var result = { courses: [], skipped: 0, totalWeeks: 0, startMonday: startMondayOf(html) };
-    var slots = [];
-    var blocks = String(html || '').split(/in\s+TaskActivity/i);
-    for (var i = 1; i < blocks.length; i++) {
-      var b = blocks[i];
-      var cut = b.indexOf('fillTable');
-      if (cut >= 0) b = b.slice(0, cut);
-
-      var teachers = [];
-      var tm = b.match(/var\s+actTeachers\s*=\s*([^;]+);/);
-      if (tm) {
-        var qre = /["']([^"']+)["']/g;
-        var qm;
-        while ((qm = qre.exec(tm[1]))) {
-          var tn = text(qm[1]);
-          if (tn) teachers.push(tn);
-        }
-      }
-
-      var loc = null;
-      var bits = null;
-      var th = b.match(/["']([^"']+)["']\s*,\s*["'][^"']*["']\s*,\s*["']([^"']*)["']\s*,\s*["']([01]+)["']/);
-      if (th) {
-        loc = text(th[2]);
-        bits = th[3];
-      }
-
-      var day = null;
-      var units = [];
-      var ure = /(\d+)\*unitCount\+(\d+)/g;
-      var um;
-      while ((um = ure.exec(b))) {
-        var d = Number(um[1]);
-        var u = Number(um[2]);
-        if (d >= 0 && d <= 6) {
-          if (day === null) day = d + 1;
-          units.push(u + 1);
-        }
-      }
-      if (day === null || !units.length) {
-        result.skipped++;
-        continue;
-      }
-
-      var weeks = [];
-      if (bits) {
-        for (var w = 0; w < bits.length; w++) {
-          if (bits.charAt(w) === '1') weeks.push(w + 1);
-        }
-        if (bits.length > result.totalWeeks) result.totalWeeks = bits.length;
-      }
-
-      var ids = [];
-      var cre = /\(([0-9A-Za-z]{3,})\)/g;
-      var cm;
-      while ((cm = cre.exec(b))) ids.push(cm[1]);
-
-      slots.push({
-        teachers: teachers,
-        position: loc,
-        day: day,
-        start: Math.min.apply(null, units),
-        end: Math.max.apply(null, units),
-        weeks: weeks,
-        ids: ids,
-        raw: b,
-      });
-    }
-
+    var result = parseTaskActivities(html);
     var doc = null;
     try { doc = new DOMParser().parseFromString(String(html || ''), 'text/html'); } catch (e) { doc = null; }
     if (!doc) return result;
 
-    var matched = 0;
     var firstCells = null;
+    var rows = [];
     var trs = doc.querySelectorAll('tbody tr');
     for (var r = 0; r < trs.length; r++) {
       var tr = trs[r];
@@ -381,56 +430,34 @@
       }
       if (cells.length < 10) continue;
       if (!firstCells) firstCells = cells.map(function (td) { return text(td.textContent).slice(0, 40); });
-
-      var serial = '';
-      var sm = cells[1].innerHTML.match(/>\s*(\d+)\s*</);
-      if (sm) serial = sm[1];
-      if (!serial) {
-        var sn = text(cells[1].textContent).match(/\d+/);
-        serial = sn ? sn[0] : '';
-      }
       var name = courseNameOfCell(cells[3]);
-      if (!serial || !name) {
-        result.skipped++;
-        continue;
-      }
-
-      var rowTeachers = text(cells[5].textContent).split(/[,，、;；\s]+/).filter(Boolean);
-      var weeksStr = text(cells[6].textContent);
+      if (!name) continue;
       var campusM = text(cells[9].textContent).match(/[^\s]*校区/);
-      var campus = campusM ? campusM[0] : '';
+      if (!campusM) continue;
+      rows.push({ name: name, teacher: text(cells[5].textContent), campus: campusM[0] });
+    }
 
-      var own = [];
-      for (var s = 0; s < slots.length; s++) {
-        if (slots[s].ids.indexOf(serial) >= 0 || containsToken(slots[s].raw, serial)) own.push(slots[s]);
+    function nameKey(value) {
+      return text(value).replace(/\s+/g, '');
+    }
+    for (var i = 0; i < result.courses.length; i++) {
+      var course = result.courses[i];
+      var sameName = rows.filter(function (row) { return nameKey(row.name) === nameKey(course.name); });
+      if (!sameName.length) continue;
+      var teachers = course.teacher ? course.teacher.split(/[,，、;；\s]+/).filter(Boolean) : [];
+      var exact = sameName.filter(function (row) {
+        return teachers.some(function (t) { return row.teacher.indexOf(t) >= 0; });
+      });
+      var pool = exact.length ? exact : sameName;
+      var campuses = [];
+      for (var p = 0; p < pool.length; p++) {
+        if (campuses.indexOf(pool[p].campus) < 0) campuses.push(pool[p].campus);
       }
-      if (!own.length) {
-        result.skipped++;
-        continue;
-      }
-      matched++;
-
-      for (var k = 0; k < own.length; k++) {
-        var sl = own[k];
-        var weeks = sl.weeks.length ? sl.weeks : parseWeeks(weeksStr);
-        if (!weeks.length) {
-          result.skipped++;
-          continue;
-        }
-        var position = sl.position || '';
-        if (campus && position.indexOf(campus) < 0) position = position ? (position + ' ' + campus) : campus;
-        result.courses.push({
-          name: name,
-          teacher: sl.teachers.length ? sl.teachers.join(',') : (rowTeachers.join(',') || null),
-          position: position || null,
-          day: sl.day,
-          startSection: sl.start,
-          endSection: sl.end,
-          weeks: weeks,
-        });
+      if (campuses.length === 1 && course.position.indexOf(campuses[0]) < 0) {
+        course.position = course.position ? (course.position + ' ' + campuses[0]) : campuses[0];
       }
     }
-    if (!matched && slots.length) result.skipped += slots.length;
+
     var PLACE = /(校区|教学楼|实验楼|宿舍楼|办公楼|主楼|教室|机房|报告厅|会议室|体育馆|操场|食堂|号楼|\d+楼|楼\s*[A-Za-z]?\s*\d|[A-Za-z]\d{2,}|\d+号|\d+\s*[层座])/;
     var suspicious = result.courses.some(function (c) {
       return PLACE.test(c.name) || (c.position && c.name === c.position);
@@ -452,12 +479,6 @@
       };
     }
     return result;
-  }
-
-  function containsToken(haystack, token) {
-    if (!haystack || !token || token.length < 3) return false;
-    var re = new RegExp('(^|[^0-9A-Za-z])' + token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^0-9A-Za-z]|$)');
-    return re.test(haystack);
   }
 
   function dedupe(list) {    var seen = Object.create(null);
@@ -590,10 +611,10 @@
     });
   }
 
-  window.__portalAdapter = { start: start, version: '1.3.0' };
+  window.__portalAdapter = { start: start, version: '1.4.0' };
   window.__tjuAdapter = window.__portalAdapter;
-  post({ action: 'ready', version: '1.3.0' });
+  post({ action: 'ready', version: '1.4.0' });
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { parseSemesterCalendar: parseSemesterCalendar, loadSemesterList: loadSemesterList, start: start };
+    module.exports = { parseSemesterCalendar: parseSemesterCalendar, loadSemesterList: loadSemesterList, parseTaskActivities: parseTaskActivities, start: start };
   }
 })();
