@@ -1,0 +1,16 @@
+{
+  "semesters": [],
+  "holidays": [],
+  "courses": [],
+  "exceptions": [],
+  "activities": [],
+  "tags": [],
+  "todos": [],
+  "countdowns": [],
+  "settings": {
+    "sound": true,
+    "vibrate": true,
+    "notify": false
+  },
+  "periodTimes": {}
+}

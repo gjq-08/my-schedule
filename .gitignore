@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.log
+
+# Sensitive data - other person's course data
+_seed_han.json
+_seed_mao.json
+
+# Sensitive data - classmate rosters (real names + student IDs)
+course_26*.txt
+
+# Course table parsing intermediates (personal timetable dumps)
+course_data*.txt
+course_html_read.txt
+
+# Temporary extraction/check files
+_bootstrap_check*.json
+_check_dump.txt
+_check_names.txt
+_courses_now.txt
+_coursetable_extract.txt
+_del_ids.txt
+_grid_extract.txt
+_new_xlsx_dump.txt
+_old_course_ids.txt
+_seed_payload.json
+
+# Original course table files (TJU)
+*.xlsx
+classes.tju.edu.cn*.pdf
+
+# Build artifacts
+*.apk
+android-app/
+
+# Local archive and historical builds
+_archive/
+releases/
+
+# Test files
+test-*.js
+
+# Screenshots
+*.jpg
+
+# Qoder Sites deployment descriptor
+.我的日程.qoder.site
+
+# UI design preview
+UI设计预览.html
+UI设计方案*.md
+
+# 本机真实数据快照（仓库只提交演示快照 web/js/seed-data.json）
+web/js/seed-data.local.json
+
+# 字体抓取过程的中间产物
+_nunito.css
+_nunito_urls.json
