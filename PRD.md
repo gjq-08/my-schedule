@@ -1350,3 +1350,16 @@ localStorage 仍是唯一数据源。Web 侧生成未来 7 天快照（复用 `d
 3. **外链实现**：新增原生 `SystemBridge.openUrl()`，校验仅允许 HTTP/HTTPS，通过系统浏览器打开；网页环境退回 `window.open`。
 4. **验证**：模拟器 v4.19 联系页内容完整；点击按钮后前台切换到 Chrome，GitHub 链接成功交给浏览器。
 5. **产物**：`我的日程-v4.19.apk` 4,967,401 B，SHA-256 `b5eea6e05f7828cb168fbda72864491c89b5aecf7ef9aa497451d2d21aa77093`，签名 `3ed6f40a…640be4` 可覆盖安装；线上更新清单已指向 4.19。
+
+## 79. v4.20 天大学期列表接口修复（2026-11-28）
+
+1. **现象**：天大教务页已正常显示「我的课表」，但点「开始导入」提示「教务未返回学期列表，请稍后重试」。
+2. **根因**：旧适配器只从入口 HTML 的学期下拉读取，并尝试了并未用于该校的 `getCurrentSemester.action` JSON 接口；天大学期日历实际通过 `POST /eams/dataQuery.action`、表单 `dataType=semesterCalendar` 返回 JavaScript 对象，包含 `id/schoolYear/name`。因此学生 `ids` 已读到，学期仍为空。
+3. **修复**（[tju.js](file:///C:/Users/admin/Desktop/某某的app/web/js/adapters/tju.js) 1.3.0）：
+   - 新增 `parseSemesterCalendar`，按字段解析日历数据，转换为「学年 + 第几学期」名称，按学年与季次排序并标记当前学期；
+   - 新增 `loadSemesterList`，优先请求规范学期日历接口，失败时才回退 HTML 下拉与当前学期接口；
+   - 不执行接口返回的 JavaScript，只解析字段；历史学期选择、学期对齐和课表解析流程保持不变。
+4. **回归**：先构造真实 `dataQuery.action` 响应格式，5 项新增测试在修复前失败；修复后覆盖接口路径与表单、重复/损坏数据、当前学期标记、完整流程能弹出学期选择。`node --check` 通过，`test-portal.mjs` 35/35。
+5. **构建核验**：`versionCode 29` / `versionName 4.20`；APK 内适配器为 1.3.0 且含规范接口；内置种子所有集合均为 0；签名仍为 `3ed6f40a…640be4`，可覆盖安装。
+6. **产物**：`我的日程-v4.20.apk` 4,968,111 B，SHA-256 `59c81fce629638fda7a736c3bb52d53644ce841a491a1c02b1454b9699da540e`。
+7. **待真机复验**：在已登录的天大教务页重新导入，确认出现学期选择并能进入课表预览；当前仅用真实响应格式做了模拟回归，未使用用户账号登录复验。

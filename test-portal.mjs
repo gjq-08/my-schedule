@@ -103,5 +103,55 @@ const p6 = s.prepareImport({
 check('天大格式标签', p6.result.format === 'tju');
 check('天大估算开学日→提示', p6.result.warnings.some(w => w.includes('估算')));
 
+// --- TJU semester calendar ---
+const { createRequire } = await import('node:module');
+const require = createRequire(import.meta.url);
+globalThis.window = {};
+const tju = require('./web/js/adapters/tju.js');
+check('天大适配器导出学期解析函数', typeof tju.parseSemesterCalendar === 'function');
+const calendarRaw = 'var semesterJson={"semesters":{"y0":[{"id":295,"schoolYear":"2026-2027","name":"1"},{"id":278,"schoolYear":"2026-2027","name":"2"}],"y1":[{"id":260,"schoolYear":"2025-2026","name":"1"}]}};';
+const calendarTerms = tju.parseSemesterCalendar?.(calendarRaw) || [];
+check('天大学期日历解析出学年与学期', calendarTerms.length === 3
+  && calendarTerms.some(t => t.id === '295' && t.name === '2026-2027学年第一学期'));
+check('天大学期日历按学年与季次排序', calendarTerms[0]?.id === '278' && calendarTerms[1]?.id === '295'
+  && calendarTerms[2]?.id === '260');
+const originalFetch = globalThis.fetch;
+const calendarCalls = [];
+globalThis.fetch = async (url, options) => {
+  calendarCalls.push({ url: String(url), options });
+  return new Response(calendarRaw, { status: 200 });
+};
+let calendarLoaded = null;
+try {
+  calendarLoaded = await tju.loadSemesterList?.();
+} finally {
+  globalThis.fetch = originalFetch;
+}
+check('天大优先请求 dataQuery 学期日历', calendarCalls.length === 1
+  && calendarCalls[0].url.endsWith('/eams/dataQuery.action')
+  && calendarCalls[0].options?.method === 'POST'
+  && calendarCalls[0].options?.body === 'dataType=semesterCalendar');
+check('天大学期日历接口可用', calendarLoaded?.length === 3 && calendarLoaded[0].id === '278');
+check('天大学期日历标记当前学期', calendarLoaded?.some(t => t.id === '295' && t.current));
+check('天大学期日历忽略重复与损坏条目', (tju.parseSemesterCalendar?.('{id:1,schoolYear:"2026-2027",name:"1"}{id:1,schoolYear:"2026-2027",name:"1"}{id:"x",schoolYear:"2026-2027",name:"1"}') || []).length === 1);
+const bridgeMessages = [];
+window.__portalNative = { postMessage: json => bridgeMessages.push(JSON.parse(json)) };
+const indexMock = '<script>bg.form.addInput(form,"ids","123456");</script>';
+globalThis.fetch = async url => {
+  const target = String(url);
+  if (target.endsWith('/eams/dataQuery.action')) return new Response(calendarRaw, { status: 200 });
+  if (target.includes('innerIndex')) return new Response(indexMock, { status: 200 });
+  if (target.includes('index.action')) return new Response(indexMock, { status: 200 });
+  return new Response('', { status: 404 });
+};
+try {
+  tju.start();
+  await new Promise(resolve => setImmediate(resolve));
+} finally {
+  globalThis.fetch = originalFetch;
+}
+check('天大完整流程能弹出学期选择而非报无学期', bridgeMessages.some(m => m.action === 'chooseTerm')
+  && !bridgeMessages.some(m => m.action === 'toast' && m.text.includes('未返回学期列表')));
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

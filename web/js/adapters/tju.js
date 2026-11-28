@@ -145,6 +145,54 @@
     return y1 + '-' + (y1 + 1) + '学年' + (spring ? '第二学期' : '第一学期');
   }
 
+  function parseSemesterCalendar(raw) {
+    var terms = [];
+    var seen = Object.create(null);
+    var entryRe = /\{([^{}]*)\}/g;
+    var entry;
+    function valueOf(body, key) {
+      var m = body.match(new RegExp('["\']?' + key + '["\']?\\s*:\\s*["\']?([^,"\'}]+)'));
+      return m ? text(m[1]).replace(/["\']$/, '') : '';
+    }
+    while ((entry = entryRe.exec(String(raw || '')))) {
+      var id = valueOf(entry[1], 'id');
+      var year = valueOf(entry[1], 'schoolYear');
+      var season = valueOf(entry[1], 'name');
+      if (!/^\d+$/.test(id) || !/^\d{4}-\d{4}$/.test(year)) continue;
+      var suffix = season === '1' ? '第一学期' : season === '2' ? '第二学期' : season === '3' ? '小学期' : '';
+      if (!suffix || seen[id]) continue;
+      seen[id] = true;
+      terms.push({ id: id, name: year + '学年' + suffix, schoolYear: year, season: Number(season) });
+    }
+    terms.sort(function (a, b) {
+      var ay = Number(a.schoolYear.slice(0, 4));
+      var by = Number(b.schoolYear.slice(0, 4));
+      return by - ay || b.season - a.season;
+    });
+    var now = new Date();
+    var currentYear = now.getMonth() + 1 >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+    var currentSeason = now.getMonth() + 1 >= 8 ? 1 : 2;
+    for (var i = 0; i < terms.length; i++) {
+      terms[i].current = Number(terms[i].schoolYear.slice(0, 4)) === currentYear && terms[i].season === currentSeason;
+    }
+    return terms;
+  }
+
+  async function loadSemesterList(indexHtml, innerHtml) {
+    var terms = [];
+    try {
+      var res = await request('/eams/dataQuery.action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: 'dataType=semesterCalendar',
+      });
+      terms = parseSemesterCalendar(await res.text());
+    } catch (e) { /* HTML fallback */ }
+    if (!terms.length) terms = parseOptions(indexHtml);
+    if (!terms.length) terms = parseOptions(innerHtml);
+    return terms;
+  }
+
   function loadCurrentSemester() {
     var paths = ['/eams/getCurrentSemester.action', '/eams/courseTableForStd!getCurrentSemester.action'];
     var chain = Promise.resolve(null);
@@ -455,20 +503,25 @@
     setBusy(true);
     var ids = '';
     var terms = [];
+    var indexHtml = '';
+    var innerHtml = '';
 
     return Promise.resolve().then(function () {
       status('正在校验登录状态…');
       return getHtml('/eams/courseTableForStd!index.action?projectId=' + PROJECT_ID);
-    }).then(function (indexHtml) {
-      terms = parseOptions(indexHtml);
+    }).then(function (html) {
+      indexHtml = html;
       status('正在读取学期列表…');
-      return getHtml('/eams/courseTableForStd!innerIndex.action?projectId=' + PROJECT_ID).then(function (innerHtml) {
-        if (!terms.length) terms = parseOptions(innerHtml);
-        ids = findIds(innerHtml);
+      return getHtml('/eams/courseTableForStd!innerIndex.action?projectId=' + PROJECT_ID).then(function (inner) {
+        innerHtml = inner;
+        ids = findIds(inner);
         if (!ids) ids = findIds(indexHtml);
       });
     }).then(function () {
       if (!ids) throw Object.assign(new Error('未找到学生标识'), { code: 'FORMAT' });
+      return loadSemesterList(indexHtml, innerHtml);
+    }).then(function (list) {
+      terms = list;
       if (!terms.length) {
         return loadCurrentSemester().then(function (cur) { if (cur && cur.id) terms = [cur]; });
       }
@@ -537,7 +590,10 @@
     });
   }
 
-  window.__portalAdapter = { start: start, version: '1.2.0' };
+  window.__portalAdapter = { start: start, version: '1.3.0' };
   window.__tjuAdapter = window.__portalAdapter;
-  post({ action: 'ready', version: '1.2.0' });
+  post({ action: 'ready', version: '1.3.0' });
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { parseSemesterCalendar: parseSemesterCalendar, loadSemesterList: loadSemesterList, start: start };
+  }
 })();
